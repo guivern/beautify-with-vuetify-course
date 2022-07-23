@@ -1,80 +1,77 @@
 <template>
-  <h1>Dahsboard</h1>
-  <v-table fixed-header height="300px">
-    <thead>
-      <tr>
-        <th class="text-left">Name</th>
-        <th class="text-left">Calories</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="item in desserts" :key="item.name" @click="onSelectRow(item)">
-        <td>{{ item.name }}</td>
-        <td>{{ item.calories }}</td>
-      </tr>
-    </tbody>
-  </v-table>
-  <v-snackbar v-model="snackbar" color="info" dark>
-    {{ selectedDessert.name }}
-    <template v-slot:actions>
-      <v-btn variant="text" @click="snackbar = false"> Close </v-btn>
-    </template>
-  </v-snackbar>
+  <div>
+    <v-container>
+      <h1>Dashboard</h1>
+
+      <v-row>
+        <v-col v-for="sale in sales" :key="`${sale.title}`" cols="12" md="4">
+          <SalesGraph :sale="sale" />
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col v-for="statistic in statistics" :key="`${statistic.title}`" cols="12" sm="6" md="3">
+          <StatisticCard :statistic="statistic" />
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="8">
+          <EmployeesTable :employees="employees" @select-employee="setEmployee" />
+        </v-col>
+        <v-col cols="4">
+          <EventTimeline :timeline="timeline" />
+        </v-col>
+      </v-row>
+
+      <v-snackbar v-model="snackbar" :left="$vuetify.breakpoint.lgAndUp">
+        You have selected {{ selectedEmployee.name }},
+        {{ selectedEmployee.title }}
+        <v-btn color="pink" text @click="snackbar = false">
+          Close
+        </v-btn>
+      </v-snackbar>
+    </v-container>
+  </div>
 </template>
+
 <script>
+import EmployeesTable from "../components/EmployeesTable";
+import EventTimeline from "../components/EventTimeline";
+import SalesGraph from "../components/SalesGraph";
+import StatisticCard from "../components/StatisticCard";
+
+import employeesData from "../data/employees.json";
+import timelineData from "../data/timeline.json";
+import salesData from "../data/sales.json";
+import statisticsData from "../data/statistics.json";
+
 export default {
+  name: "DashboardPage",
+  components: {
+    EmployeesTable,
+    EventTimeline,
+    SalesGraph,
+    StatisticCard,
+  },
   data() {
     return {
+      employees: employeesData,
+      sales: salesData,
+      selectedEmployee: {
+        name: "",
+        title: "",
+      },
       snackbar: false,
-      selectedDessert: null,
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-        },
-      ],
+      statistics: statisticsData,
+      timeline: timelineData,
     };
   },
   methods: {
-    onSelectRow(item) {
+    setEmployee(event) {
       this.snackbar = true;
-      this.selectedDessert = item;
+      this.selectedEmployee.name = event.name;
+      this.selectedEmployee.title = event.title;
     },
   },
 };
